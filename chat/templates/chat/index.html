@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <main>
+        <h1>Chatbot</h1>
+
+        <div id="chat"></div>
+
+        <!-- ✍️ INPUT -->
+        <div class="input-area">
+            <input type="text" id="msg" placeholder="Digite sua mensagem...">
+            <button onclick="enviar()">Enviar</button>
+        </div>
+    </main>
+
+</div>
+
+
+<footer>
+    Meu primeiro projeto de chatbot 🤖
+</footer>
+
+<script>
+function enviar() {
+    let msg = document.getElementById("msg").value;
+    let chat = document.getElementById("chat");
+
+    if (!msg.trim()) return;
+
+    fetch("/chat/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie('csrftoken')
+        },
+        body: JSON.stringify({ message: msg })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        chat.innerHTML += `
+            <div class="msg user">${msg}</div>
+            <div class="msg bot">${data.reply}</div>
+        `;
+
+        // 🔽 scroll automático
+        chat.scrollTop = chat.scrollHeight;
+
+        document.getElementById("msg").value = "";
+    });
+}
+
+function getCookie(name) {
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
+</script>
+
+</body>
+</html>
